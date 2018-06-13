@@ -1,0 +1,158 @@
+{{extend 'layout.html'}}
+
+{{block head}}
+<script src="{{=URL('static', 'js/vue.js')}}"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!--<script src="{{=URL('static', 'js/piechart.js')}}"></script>-->
+<script>
+    var get_posts_url = "{{=URL('surveys', 'get_posts')}}";
+    var add_post_url = "{{=URL('surveys', 'add_post', user_signature=True)}}";
+    var del_post_url = "{{=URL('surveys', 'del_post', user_signature=True)}}";
+    var edit_post_submit_url = "{{=URL('surveys', 'edit_post_submit', user_signature=True)}}";
+    var edit_post_get_url = "{{=URL('surveys', 'edit_post_get')}}";
+	var get_responses_url = "{{=URL('surveys', 'get_responses')}}";
+	var submit_response_url = "{{=URL('surveys', 'submit_response')}}";
+	var iterate_totals_url = "{{=URL('surveys', 'iterate_totals')}}";
+	
+</script>
+{{end}}
+
+<div class="main_content">
+	<div id="vue-div" class="display:none">
+	<div v-if="!logged_in">
+        <center> <p> You must be logged in to Post and view surveys.</p> </center>
+    </div>
+	<div v-else>
+      <div class="button_bar">
+            <button v-if="!is_adding_post" class="btn btn-danger btn-sm"
+             v-on:click="add_post_button()" v-bind:class="{'disabled': !logged_in}">
+			 <i class="fa fa-plus">Add Survey</i>
+           </button>
+            <button v-if="is_adding_post" class="btn btn-info btn-sm"
+             v-on:click="add_post_button()"> <i class="fa fa-times"></i>
+            </button>
+      </div>
+
+      <div v-if="is_adding_post" id="add_new_post">
+
+        <div>
+          <form action="#" v-on:submit.prevent="add_post" class="form-horizontal" enctype="multipart/form-data" method="post">
+              <div class="form-group" id="no_table_post_content__row">
+                    <label class="control-label col-sm-3" for="no_table_post_content"
+                     id="no_table_post_content__label"></label>
+                    <div class="col-sm-9">
+                        Question: <input v-model="question" type="text" placeholder="Add Your Question">
+						Option 1: <input v-model="opt1" type="text" placeholder="Enter Survey Option">
+						Option 2: <input v-model="opt2" type="text" placeholder="Enter Survey Option">
+						Option 3: <input v-model="opt3" type="text" placeholder="Enter Survey Option">
+						Option 4: <input v-model="opt4" type="text" placeholder="Enter Survey Option">
+                        <span class="help-block"></span>
+                    </div>
+              </div>
+
+                <div class="form-group" id="submit_record__row">
+                      <div class="col-sm-9 col-sm-offset-3">
+                            <input class="post-button btn btn-info btn-sm" id="add_post_submit" value="Submit" type="submit">
+                      </div>
+                </div>
+            </form>
+          </div>
+        </div>
+
+      <div class="post-content">
+	    <div class="container"> 
+		  
+			<div class="half">
+			  <template v-for="post in posts">
+				 <div class="post">
+					<div class="post_content">
+					  <div v-if="post._idx === edit_post_id">
+						<div v-if="!is_editing">
+						  ${post.post_content}
+						</div>
+						<div v-if="is_editing" id="edit_post_div">
+						  <form action="#" v-on:submit.prevent="edit_post_submit" class="form-horizontal" enctype="multipart/form-data" method="post">
+							  <div class="form-group" id="no_table_post_content__row">
+									<label class="control-label col-sm-3" for="no_table_post_content"
+									 id="no_table_post_content__label"></label>
+									<div class="col-sm-9">
+										<textarea class="form-control string" id="no_table_post_content" name="post_content"
+										  v-model="edit_content" placeholder="" type="textarea"></textarea>
+										  <span class="help-block"></span>
+									</div>
+							  </div>
+
+								<div class="form-group" id="submit_record__row">
+									  <div class="col-sm-9 col-sm-offset-3">
+											<input class="btn btn-info btn-sm" id="edit_post_submit" value="Submit" type="submit">
+											<button v-if="is_editing" class="btn btn-info btn-sm"
+											 v-on:click="edit_post_cancel()"> <i class="fa fa-plus"></i>
+											</button>
+											<input class="post-button btn btn-info btn-sm" id="submit_response(image._idx)" value="Submit" type="submit">
+									  </div>
+								</div>
+							</form>
+						  </div>
+					  </div>
+					  <div v-else>
+						<p>${post.question}</p>
+						<div>
+							<input type="checkbox" id="subscribeNews" name="subscribe" value="1" v-model="option1">
+							<label for="subscribeNews">${post.opt1}</label>
+						</div>
+						<div>
+							<input type="checkbox" id="subscribeNews" name="subscribe" value="1" v-model="option2">
+							<label for="subscribeNews">${post.opt2}</label>
+						</div>
+						<div>
+							<input type="checkbox" id="subscribeNews" name="subscribe" value="1" v-model="option3">
+							<label for="subscribeNews">${post.opt3}</label>
+						</div>
+						<div>
+							<input type="checkbox" id="subscribeNews" name="subscribe" value="1" v-model="option4">
+							<label for="subscribeNews">${post.opt4}</label>
+						</div>
+						
+					  </div>
+					  
+					
+					</div>
+					
+					<div class="post_info">
+						<span>Author: ${post.user_name}</span>
+						<span>Created: ${post.created_on}</span>
+						<span v-if="post.updated_on != null">Updated: ${post.updated_on}</span>
+						<span v-if="email == post.user_email">
+						  <span><i class="fa fa-trash-o" v-on:click="delete_post(post._idx)"></i></span>
+						  <input class="post-button btn btn-info btn-sm" v-on:click="submit_response(post._idx)" value="Submit" type="submit">
+						</span>
+						<span v-if="email != post.user_email">
+							<input class="post-button btn btn-info btn-sm" v-on:click="submit_response(post._idx)" value="Submit" type="submit">
+						</span>
+					</div>
+					<button class="Visualize" v-on:click="renderPieChart(post._idx)"> <i>Visualize</i></button>
+				  </div>
+			  
+			  </template>
+			</div>
+			<div class="half">
+			  <!--<div style="margin:75px;"  id="chart" onload="renderPieChart(#chart)"></div>-->
+				<div style="margin:75px;"  id="chart"></div>
+			</div>	
+		  </div>
+		
+      </div>
+	  
+	  <!--<div>
+	    <template v-for="survey in surveys">
+		  
+		</template>
+	  </div>-->
+<!--var inputData = [{label: post.opt1,value:post.res1},{label:post.opt2,value:post.res2},{label:post.opt3,value:post.res3},{label:post.opt4,value:post.res4}];-->
+	</div>
+  </div>  <!-- END VUE DIV -->
+</div>
+
+
+
+<script src="{{=URL('static', 'js/surveys.js')}}"></script>

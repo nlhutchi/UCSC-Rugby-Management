@@ -3,11 +3,11 @@
 {{block head}}
 <script src="{{=URL('static', 'js/vue.js')}}"></script>
 <script>
-    var get_posts_url = "{{=URL('api', 'get_posts')}}";
-    var add_post_url = "{{=URL('api', 'add_post', user_signature=True)}}";
-    var del_post_url = "{{=URL('api', 'del_post', user_signature=True)}}";
-    var edit_post_submit_url = "{{=URL('api', 'edit_post_submit', user_signature=True)}}";
-    var edit_post_get_url = "{{=URL('api', 'edit_post_get')}}";
+    var get_posts_url = "{{=URL('postpage', 'get_posts')}}";
+    var add_post_url = "{{=URL('postpage', 'add_post', user_signature=True)}}";
+    var del_post_url = "{{=URL('postpage', 'del_post', user_signature=True)}}";
+    var edit_post_submit_url = "{{=URL('postpage', 'edit_post_submit', user_signature=True)}}";
+    var edit_post_get_url = "{{=URL('postpage', 'edit_post_get')}}";
 </script>
 {{end}}
 
@@ -15,13 +15,13 @@
 
     <div id="vue-div" class="display:none">
 	<div v-if="!logged_in">
-        <center> <p> You must be logged in to post and view events.</p> </center>
+        <center> <p> You must be logged in to post and view announcements.</p> </center>
     </div>
 	<div v-else>
       <div class="button_bar">
             <button v-if="!is_adding_post" class="btn btn-danger btn-sm"
              v-on:click="add_post_button()" v-bind:class="{'disabled': !logged_in}">
-			 <i class="fa fa-plus">Add event</i>
+			 <i class="fa fa-plus">Add Announcements</i>
            </button>
             <button v-if="is_adding_post" class="btn btn-info btn-sm"
              v-on:click="add_post_button()"> <i class="fa fa-times"></i>
@@ -36,10 +36,8 @@
                     <label class="control-label col-sm-3" for="no_table_post_content"
                      id="no_table_post_content__label"></label>
                     <div class="col-sm-9">
-                        Event Name: <input v-model="form_content" placeholder="Enter Event Name" type="textarea"></input>
-						Event Location: <input v-model="evt_loc" type="text" placeholder="Enter Location">
-						Event Description: <input v-model="evt_desc" type="text" placeholder="Enter short description">
-						<input id="datetime" type="datetime-local" v-model="event_on">
+                        <textarea class="form-control string" id="no_table_post_content" name="post_content"
+                          v-model="form_content" placeholder="Your post goes here!" type="textarea"></textarea>
                           <span class="help-block"></span>
                     </div>
               </div>
@@ -51,18 +49,15 @@
                 </div>
             </form>
           </div>
-		  
         </div>
-		<h1>Upcoming Events:</h1>
+
       <div class="post-content">
           <template v-for="post in posts">
               <div class="post">
                 <div class="post_content">
                   <div v-if="post._idx === edit_post_id">
                     <div v-if="!is_editing">
-                      <h2>${post.event_name}</h2>
-					  <p>Where: ${post.event_location}</p>
-						<p>${post.event_description}</p>
+                      ${post.post_content}
                     </div>
                     <div v-if="is_editing" id="edit_post_div">
                       <form action="#" v-on:submit.prevent="edit_post_submit" class="form-horizontal" enctype="multipart/form-data" method="post">
@@ -70,13 +65,8 @@
                                 <label class="control-label col-sm-3" for="no_table_post_content"
                                  id="no_table_post_content__label"></label>
                                 <div class="col-sm-9">
-                                    Name: <input class="form-control string" id="no_table_post_content" name="post_content"
-                                      v-model="edit_content" placeholder="" type="text"></input>
-									Location:  <input class="form-control string" id="no_table_post_content" name="event_location"
-                                      v-model="edit_location" placeholder="" type="text"></input>
-									Details:  <input class="form-control string" id="no_table_post_content" name="enent_descrip"
-                                      v-model="edit_desc" placeholder="" type="text"></input>
-									Time:  <input id="datetime" type="datetime-local" v-model="event_on">
+                                    <textarea class="form-control string" id="no_table_post_content" name="post_content"
+                                       v-model="edit_content" placeholder="" type="textarea"></textarea>
                                       <span class="help-block"></span>
                                 </div>
                           </div>
@@ -93,14 +83,12 @@
                       </div>
                   </div>
                   <div v-else>
-                    <h2>${post.event_name}</h2>
-					<p>Where: ${post.event_location}</p>
-					<p>${post.event_description}</p>
+                    ${post.post_content}
                   </div>
                 </div>
                 <div class="post_info">
                     <span>Author: ${post.user_name}</span>
-                    <span>Event on: ${post.event_on}</span>
+                    <span>Created: ${post.created_on}</span>
                     <span v-if="post.updated_on != null">Updated: ${post.updated_on}</span>
                     <span v-if="email == post.user_email">
                       <span><i class="fa fa-pencil" v-on:click="edit_post_button(post._idx)"></i></span>
@@ -118,4 +106,4 @@
 
 </div>
 
-<script src="{{=URL('static', 'js/default_index.js')}}"></script>
+<script src="{{=URL('static', 'js/postpage.js')}}"></script>

@@ -52,10 +52,7 @@ var app = function() {
         $.post(add_post_url,
             {
                 form_content: self.vue.form_content,
-				evt_desc: self.vue.evt_desc,
-				evt_loc: self.vue.evt_loc,
                 email: self.vue.email,
-				event_on: self.vue.event_on,
             },
             function (data) {
                 $.web2py.enableElement($("#add_post_submit"));
@@ -67,12 +64,13 @@ var app = function() {
     };
 
     self.delete_post = function (post_idx) {
-      console.log('delete clicked ' + post_idx + self.vue.posts[post_idx].id);
+      console.log('delete clicked ' + post_idx);
       $.post(del_post_url,
             { post_id: self.vue.posts[post_idx].id },
             function () {
                 self.vue.posts.splice(post_idx, 1);
-                self.get_posts();
+                if(self.vue.posts.length <= 3)
+                  self.get_posts();
                 enumerate(self.vue.posts);
             }
         )
@@ -92,12 +90,11 @@ var app = function() {
       var pp = {post_id: self.vue.posts[post_idx].id};
       self.vue.edit_post_id = post_idx;
       $.getJSON(edit_post_get_url + "?" + $.param(pp), function (data) {
-          self.vue.edit_content = data.edit.edit_content;
-		  self.vue.edit_location = data.edit.edit_location;
-		  self.vue.edit_desc = data.edit.edit_desc;
+          self.vue.edit_content = data.edit_content;
       });
       enumerate(self.vue.posts);
     };
+	
 
     self.edit_post_submit = function () {
         console.log('edit post submit');
@@ -105,17 +102,12 @@ var app = function() {
         $.post(edit_post_submit_url,
             {
                 edit_content: self.vue.edit_content,
-				edit_location: self.vue.edit_location,
-				edit_desc: self.vue.edit_desc,
-				edit_time: self.vue.event_on,
                 post_id: self.vue.posts[self.vue.edit_post_id].id,
             },
             function (data) {
                 $.web2py.enableElement($("#edit_post_submit"));
-                self.vue.posts[self.vue.edit_post_id].event_name = data.post.event_name;
-                self.vue.posts[self.vue.edit_post_id].event_location = data.post.event_location;
-                self.vue.posts[self.vue.edit_post_id].event_description = data.post.event_description;
-                self.vue.posts[self.vue.edit_post_id].event_on = data.post.event_on;
+                self.vue.posts[self.vue.edit_post_id].post_content = data.post.post_content;
+                self.vue.posts[self.vue.edit_post_id].updated_on = data.post.updated_on;
                 enumerate(self.vue.posts);
             });
     };
@@ -135,12 +127,7 @@ var app = function() {
             form_content: null,
             edit_content: null,
             edit_post_id: null,
-            email: null,
-			evt_desc: null,
-			evt_loc: null,
-			event_on: null,
-			edit_location: null,
-			edit_desc: null,
+            email: null
         },
         methods: {
             get_more: self.get_more,

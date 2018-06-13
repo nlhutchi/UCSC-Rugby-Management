@@ -1,4 +1,63 @@
-/* line 1, ../sass/_main.scss */
-.colorful {
-  color: #bb8833;
+.post_listing {
+  margin: 10px 0px 10px 0px;
+  padding: 0 0 0 0px;
+}
+
+/* line 7, ../sass/_main.scss */
+.post_list {
+  padding-top: 10px;
+}
+
+/* line 15, ../sass/_main.scss */
+.post_content {
+  font-size: 25px;
+}
+
+/* line 19, ../sass/_main.scss */
+.post_info {
+  font-size: 12px;
+}
+
+/* line 24, ../sass/_main.scss */
+.post_info span {
+  padding-right: 10px;
+}
+
+/* line 28, ../sass/_main.scss */
+.edit_cancel_button {
+  margin: auto;
+  display: block;
+}
+
+/* line 33, ../sass/_main.scss */
+.post {
+  border-color: #cccccc;
+  border-style: solid;
+  border-width: 1px;
+  background: #eeeeee;
+  margin: 20px 0px 20px 0px;
+  padding: 20px;
+  -moz-border-radius: 16px;
+  -webkit-border-radius: 16px;
+  border-radius: 16px;
+}
+
+/* line 43, ../sass/_main.scss */
+.edit_delete {
+  color: #29ABE0;
+}
+
+/* line 46, ../sass/_main.scss */
+.mycontent {
+  margin-left: auto;
+  margin-right: auto;
+  height: auto;
+  width: auto;
+}
+
+/* line 54, ../sass/_main.scss */
+.edit_button_list {
+  float: left;
+  clear: left;
+  margin-left: 134px;
 }
